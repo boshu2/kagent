@@ -96,8 +96,11 @@ controller:
     maxBufSize: 1Mi # 1024 * 1024
     initialBufSize: 4Ki # 4 * 1024
     timeout: 600s # 600 seconds
-  # -- Namespaces the controller should watch.
-  # If empty, the controller will watch ALL available namespaces.
+  # -- Namespaces the controller should watch (namespace-scoped mode).
+  # When set, the controller enforces namespace isolation and only reconciles
+  # resources within the specified namespaces. This enables multi-tenant
+  # deployments where different tenants' resources are isolated.
+  # If empty, the controller watches ALL namespaces (cluster-wide mode).
   # @default -- [] (watches all available namespaces)
   watchNamespaces: []
   #  - watch-ns-1
