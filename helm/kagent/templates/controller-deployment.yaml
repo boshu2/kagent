@@ -73,7 +73,7 @@ spec:
           resources:
             {{- toYaml .Values.controller.resources | nindent 12 }}
           securityContext:
-            {{- toYaml .Values.controller.securityContext | nindent 12 }}
+            {{- toYaml (.Values.controller.securityContext | default .Values.securityContext) | nindent 12 }}
           startupProbe:
             httpGet:
               path: /health

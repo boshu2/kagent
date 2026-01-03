@@ -36,3 +36,19 @@ data:
   STREAMING_TIMEOUT: {{ .Values.controller.streaming.timeout | quote }}
   WATCH_NAMESPACES: {{ include "kagent.watchNamespaces" . | quote }}
   ZAP_LOG_LEVEL: {{ .Values.controller.loglevel | quote }}
+  {{- if .Values.auth.oauth2.enabled }}
+  # OAuth2/OIDC Authentication
+  AUTH_OAUTH2_ENABLED: "true"
+  AUTH_OAUTH2_ISSUER_URL: {{ .Values.auth.oauth2.issuerUrl | quote }}
+  AUTH_OAUTH2_CLIENT_ID: {{ .Values.auth.oauth2.clientId | quote }}
+  {{- if .Values.auth.oauth2.audience }}
+  AUTH_OAUTH2_AUDIENCE: {{ .Values.auth.oauth2.audience | quote }}
+  {{- end }}
+  {{- if .Values.auth.oauth2.requiredScopes }}
+  AUTH_OAUTH2_REQUIRED_SCOPES: {{ join "," .Values.auth.oauth2.requiredScopes | quote }}
+  {{- end }}
+  AUTH_OAUTH2_USER_ID_CLAIM: {{ .Values.auth.oauth2.userIdClaim | quote }}
+  AUTH_OAUTH2_ROLES_CLAIM: {{ .Values.auth.oauth2.rolesClaim | quote }}
+  AUTH_OAUTH2_SKIP_ISSUER_VALIDATION: {{ .Values.auth.oauth2.skipIssuerValidation | quote }}
+  AUTH_OAUTH2_SKIP_EXPIRY_VALIDATION: {{ .Values.auth.oauth2.skipExpiryValidation | quote }}
+  {{- end }}

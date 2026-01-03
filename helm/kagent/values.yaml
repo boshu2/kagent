@@ -25,16 +25,55 @@ labels: {}
   # environment: production
   # team: platform
 
-podSecurityContext: {}
-  # fsGroup: 2000
+# -- Pod-level security context applied to all pods
+# These defaults are compatible with OpenShift's restricted-v2 SCC
+podSecurityContext:
+  # -- Run pods as non-root for security
+  runAsNonRoot: true
+  # -- Security Compliance Context (required for OpenShift restricted-v2)
+  seccompProfile:
+    type: RuntimeDefault
 
-securityContext: {}
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
-  # runAsUser: 1000
+# -- Container-level security context applied to all containers
+# These defaults are compatible with OpenShift's restricted-v2 SCC
+securityContext:
+  # -- Drop all capabilities for security
+  capabilities:
+    drop:
+    - ALL
+  # -- Prevent privilege escalation
+  allowPrivilegeEscalation: false
+  # -- Run as non-root user
+  runAsNonRoot: true
+  # -- Use read-only root filesystem where possible
+  # Note: Set to false if the container needs to write to the filesystem
+  readOnlyRootFilesystem: false
+
+# ==============================================================================
+# AUTHENTICATION CONFIGURATION
+# ==============================================================================
+
+auth:
+  # -- Enable OAuth2/OIDC authentication for the kagent API
+  # When disabled, the API is unsecured (suitable for development)
+  oauth2:
+    enabled: false
+    # -- OIDC Issuer URL (e.g., https://accounts.google.com, https://login.microsoftonline.com/{tenant}/v2.0)
+    issuerUrl: ""
+    # -- OAuth2 Client ID for token validation
+    clientId: ""
+    # -- Expected audience claim in the token (optional, defaults to clientId)
+    audience: ""
+    # -- Required scopes that must be present in the token (optional)
+    requiredScopes: []
+    # -- JWT claim to use as the user ID (default: "sub")
+    userIdClaim: "sub"
+    # -- JWT claim to use for roles (default: "roles")
+    rolesClaim: "roles"
+    # -- Skip issuer validation (NOT recommended for production)
+    skipIssuerValidation: false
+    # -- Skip token expiry validation (NOT recommended for production)
+    skipExpiryValidation: false
 
 # ==============================================================================
 # CORE KAGENT COMPONENTS
