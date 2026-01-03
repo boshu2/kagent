@@ -33,9 +33,6 @@ func DefaultAuditLogConfig() AuditLogConfig {
 	}
 }
 
-// requestIDKey is the context key for request ID
-type requestIDKey struct{}
-
 // namespacePattern matches namespace in API paths like /api/agents/{namespace}/{name}
 var namespacePattern = regexp.MustCompile(`^/api/[^/]+/([^/]+)(?:/|$)`)
 

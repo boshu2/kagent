@@ -76,7 +76,7 @@ func newTestOIDCServer(t *testing.T) *testOIDCServer {
 
 	// OIDC discovery endpoint
 	mux.HandleFunc("/.well-known/openid-configuration", func(w http.ResponseWriter, r *http.Request) {
-		discovery := map[string]interface{}{
+		discovery := map[string]any{
 			"issuer":                 ts.server.URL,
 			"authorization_endpoint": ts.server.URL + "/authorize",
 			"token_endpoint":         ts.server.URL + "/token",
@@ -106,7 +106,7 @@ func (ts *testOIDCServer) URL() string {
 	return ts.server.URL
 }
 
-func (ts *testOIDCServer) createToken(t *testing.T, claims map[string]interface{}, expiry time.Duration) string {
+func (ts *testOIDCServer) createToken(t *testing.T, claims map[string]any, expiry time.Duration) string {
 	t.Helper()
 
 	builder := jwt.NewBuilder()
@@ -206,9 +206,9 @@ func TestOAuth2Authenticator_Authenticate(t *testing.T) {
 		{
 			name: "valid token in Authorization header",
 			setupHeaders: func() http.Header {
-				token := ts.createToken(t, map[string]interface{}{
+				token := ts.createToken(t, map[string]any{
 					"sub":   "user123",
-					"roles": []interface{}{"admin", "user"},
+					"roles": []any{"admin", "user"},
 				}, time.Hour)
 				h := http.Header{}
 				h.Set("Authorization", "Bearer "+token)
@@ -225,7 +225,7 @@ func TestOAuth2Authenticator_Authenticate(t *testing.T) {
 				return http.Header{}
 			},
 			setupQuery: func() url.Values {
-				token := ts.createToken(t, map[string]interface{}{
+				token := ts.createToken(t, map[string]any{
 					"sub": "user456",
 				}, time.Hour)
 				q := url.Values{}
@@ -247,7 +247,7 @@ func TestOAuth2Authenticator_Authenticate(t *testing.T) {
 		{
 			name: "expired token",
 			setupHeaders: func() http.Header {
-				token := ts.createToken(t, map[string]interface{}{
+				token := ts.createToken(t, map[string]any{
 					"sub": "user789",
 				}, -time.Hour) // Already expired
 				h := http.Header{}
@@ -272,7 +272,7 @@ func TestOAuth2Authenticator_Authenticate(t *testing.T) {
 		{
 			name: "bearer prefix case insensitive",
 			setupHeaders: func() http.Header {
-				token := ts.createToken(t, map[string]interface{}{
+				token := ts.createToken(t, map[string]any{
 					"sub": "user-case",
 				}, time.Hour)
 				h := http.Header{}
@@ -286,7 +286,7 @@ func TestOAuth2Authenticator_Authenticate(t *testing.T) {
 		{
 			name: "roles as space-separated string",
 			setupHeaders: func() http.Header {
-				token := ts.createToken(t, map[string]interface{}{
+				token := ts.createToken(t, map[string]any{
 					"sub":   "user-roles",
 					"roles": "role1 role2 role3",
 				}, time.Hour)
@@ -344,7 +344,7 @@ func TestOAuth2Authenticator_RequiredScopes(t *testing.T) {
 
 	tests := []struct {
 		name        string
-		scopes      interface{}
+		scopes      any
 		expectError bool
 	}{
 		{
@@ -354,7 +354,7 @@ func TestOAuth2Authenticator_RequiredScopes(t *testing.T) {
 		},
 		{
 			name:        "has all required scopes as array",
-			scopes:      []interface{}{"read", "write", "admin"},
+			scopes:      []any{"read", "write", "admin"},
 			expectError: false,
 		},
 		{
@@ -371,7 +371,7 @@ func TestOAuth2Authenticator_RequiredScopes(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			claims := map[string]interface{}{
+			claims := map[string]any{
 				"sub": "user123",
 			}
 			if tt.scopes != nil {
@@ -406,7 +406,7 @@ func TestOAuth2Authenticator_AudienceValidation(t *testing.T) {
 
 	tests := []struct {
 		name        string
-		audience    interface{}
+		audience    any
 		expectError bool
 	}{
 		{
@@ -416,7 +416,7 @@ func TestOAuth2Authenticator_AudienceValidation(t *testing.T) {
 		},
 		{
 			name:        "audience in array",
-			audience:    []interface{}{"other-api", "my-api"},
+			audience:    []any{"other-api", "my-api"},
 			expectError: false,
 		},
 		{
@@ -433,7 +433,7 @@ func TestOAuth2Authenticator_AudienceValidation(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			claims := map[string]interface{}{
+			claims := map[string]any{
 				"sub": "user123",
 			}
 			if tt.audience != nil {
@@ -585,7 +585,7 @@ func TestOAuth2Session(t *testing.T) {
 			},
 		},
 		accessToken: "test-token",
-		claims: map[string]interface{}{
+		claims: map[string]any{
 			"sub":   "test-user",
 			"email": "test@example.com",
 		},
@@ -626,7 +626,7 @@ func TestOAuth2Authenticator_CacheClearing(t *testing.T) {
 	require.NoError(t, err)
 
 	// Make a request to populate the cache
-	token := ts.createToken(t, map[string]interface{}{
+	token := ts.createToken(t, map[string]any{
 		"sub": "user123",
 	}, time.Hour)
 	headers := http.Header{}
@@ -665,7 +665,7 @@ func TestOAuth2Authenticator_SkipValidation(t *testing.T) {
 		require.NoError(t, err)
 
 		// Create an expired token
-		token := ts.createToken(t, map[string]interface{}{
+		token := ts.createToken(t, map[string]any{
 			"sub": "user123",
 		}, -time.Hour)
 
@@ -687,7 +687,7 @@ func TestOAuth2Authenticator_SkipValidation(t *testing.T) {
 
 		// The token issuer from ts.createToken matches ts.URL(),
 		// so this should work regardless
-		token := ts.createToken(t, map[string]interface{}{
+		token := ts.createToken(t, map[string]any{
 			"sub": "user456",
 		}, time.Hour)
 
@@ -712,10 +712,10 @@ func TestOAuth2Authenticator_CustomClaims(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	token := ts.createToken(t, map[string]interface{}{
+	token := ts.createToken(t, map[string]any{
 		"sub":    "user123",
 		"email":  "test@example.com",
-		"groups": []interface{}{"developers", "admins"},
+		"groups": []any{"developers", "admins"},
 	}, time.Hour)
 
 	headers := http.Header{}

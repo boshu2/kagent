@@ -99,7 +99,7 @@ type OAuth2Authenticator struct {
 type OAuth2Session struct {
 	principal   auth.Principal
 	accessToken string
-	claims      map[string]interface{}
+	claims      map[string]any
 	expiresAt   time.Time
 }
 
@@ -108,7 +108,7 @@ func (s *OAuth2Session) Principal() auth.Principal {
 }
 
 // Claims returns the raw JWT claims
-func (s *OAuth2Session) Claims() map[string]interface{} {
+func (s *OAuth2Session) Claims() map[string]any {
 	return s.claims
 }
 
@@ -243,7 +243,7 @@ func (a *OAuth2Authenticator) validateToken(ctx context.Context, tokenString str
 	}
 
 	// Extract claims for session
-	claims := make(map[string]interface{})
+	claims := make(map[string]any)
 	for iter := token.Iterate(ctx); iter.Next(ctx); {
 		pair := iter.Pair()
 		claims[pair.Key.(string)] = pair.Value
@@ -261,7 +261,7 @@ func (a *OAuth2Authenticator) validateToken(ctx context.Context, tokenString str
 	var roles []string
 	if rolesClaim, ok := claims[a.config.RolesClaim]; ok {
 		switch r := rolesClaim.(type) {
-		case []interface{}:
+		case []any:
 			for _, role := range r {
 				if s, ok := role.(string); ok {
 					roles = append(roles, s)
@@ -307,7 +307,7 @@ func (a *OAuth2Authenticator) validateScopes(token jwt.Token) error {
 	switch s := scopeClaim.(type) {
 	case string:
 		tokenScopes = strings.Fields(s)
-	case []interface{}:
+	case []any:
 		for _, scope := range s {
 			if str, ok := scope.(string); ok {
 				tokenScopes = append(tokenScopes, str)
