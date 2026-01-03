@@ -79,6 +79,7 @@ tests:
       pdb:
         enabled: true
         controller:
+          minAvailable: null
           maxUnavailable: 1
         ui:
           minAvailable: 1
@@ -109,6 +110,7 @@ tests:
         controller:
           minAvailable: 1
         ui:
+          minAvailable: null
           maxUnavailable: 1
     documentIndex: 1
     asserts:
