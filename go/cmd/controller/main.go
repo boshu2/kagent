@@ -21,8 +21,8 @@ import (
 	"strings"
 
 	"github.com/kagent-dev/kagent/go/internal/httpserver/auth"
-	pkgauth "github.com/kagent-dev/kagent/go/pkg/auth"
 	"github.com/kagent-dev/kagent/go/pkg/app"
+	pkgauth "github.com/kagent-dev/kagent/go/pkg/auth"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
